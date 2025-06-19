@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Data Kasir - CafePOS</title>
+    <link rel="stylesheet" href="css/users.css"/>
+</head>
+<body>
+    <div class="container">
+        <button class="off back-btn" onclick="history.back()">Kembali</button>
+        <h2>CafePOS - Data Transaksi Semua Kasir</h2>
+        <h3>Tambah Kasir</h3>
+        <input id="username" type="text" placeholder="Username" />
+        <input id="password" type="password" placeholder="Password" />
+        <button class="on" onclick="tambahKasir()">Simpan</button>
+
+        <h3>Daftar Kasir</h3>
+        <table id="tabel-kasir">
+            <thead>
+                <tr><th>Username</th><th>Password</th><th>Aksi</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="js/init.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            window.location.href = 'login.html';
+        } else {
+            loadKasir();
+        }
+
+        function tambahKasir() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch(host + '/api/routes.php?action=addUser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.text())
+            .then(msg => { alert(msg); loadKasir(); });
+        }
+
+        function loadKasir() {
+            fetch(host + '/api/routes.php?action=getUsers')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('#tabel-kasir tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(kasir => {
+                        tbody.innerHTML += `<tr id="row-${kasir.id}">
+                            <td><input id="username-${kasir.id}" type="text" value="${kasir.username}"></td>
+                            <td><input id="password-${kasir.id}" type="password" value="${kasir.password}"></td>
+                            <td>
+                                <button class="table-btn" onclick="editKasir(${kasir.id})">Ubah</button>
+                                <button class="table-btn" onclick="hapusKasir(${kasir.id})">Hapus</button>
+                            </td>
+                        </tr>`;
+                    });
+                });
+        }
+
+        function editKasir(id) {
+            const username = document.getElementById(`username-${id}`).value;
+            const password = document.getElementById(`password-${id}`).value;
+
+            fetch(host + '/api/routes.php?action=editUser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, username, password })
+            })
+            .then(res => res.text())
+            .then(msg => {
+                alert(msg);
+                loadKasir();
+            });
+        }
+
+        function hapusKasir(id) {
+            if (confirm('Yakin ingin menghapus kasir ini?')) {
+                fetch(host + '/api/routes.php?action=deleteUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                })
+                .then(res => res.text())
+                .then(msg => { alert(msg); loadKasir(); });
+            }
+        }
+    </script>
+</body>
+</html>

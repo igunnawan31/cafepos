@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kasir - Transaksi Baru - CafePOS</title>
+    <link rel="stylesheet" href="css/order.css"/>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="history.back()">Kembali</button>
+        <h2>CafePOS - Transaksi Baru</h2>
+
+        <div id="product-list"></div>
+
+        <h3>Cart</h3>
+        <ul id="cart-list"></ul>
+
+        <h4 id="total-price">Total: Rp 0</h4>
+        <button class="checkout-btn" onclick="checkout()">Checkout</button>
+    </div>
+
+    <script src="js/init.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'kasir') window.location.href = 'login.html';
+
+        let cart = [];
+        let stockData = {};
+
+        function fetchProducts() {
+            fetch(host + '/api/routes.php?action=getProducts')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('product-list');
+                    container.innerHTML = '';
+                    data.forEach(product => {
+                        stockData[product.id] = product.stock;
+                        const div = document.createElement('div');
+                        div.innerHTML = `${product.name}<br>Rp ${product.price}<br>(Stok: ${product.stock}) <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add</button>`;
+                        container.appendChild(div);
+                    });
+                });
+        }
+
+        function addToCart(id, name, price) {
+            const found = cart.find(item => item.product_id === id);
+            if (found) {
+                if (found.quantity + 1 > stockData[id]) {
+                    alert("Stok tidak mencukupi");
+                    return;
+                }
+                found.quantity++;
+            } else {
+                if (stockData[id] <= 0) {
+                    alert("Stok habis");
+                    return;
+                }
+                cart.push({ product_id: id, name, price, quantity: 1 });
+            }
+            renderCart();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.product_id !== id);
+            renderCart();
+        }
+
+        function renderCart() {
+            const cartList = document.getElementById('cart-list');
+            cartList.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                const li = document.createElement('li');
+                li.innerHTML = `${item.name} x${item.quantity} - Rp ${item.price * item.quantity} <button class="remove-btn" onclick="removeFromCart(${item.product_id})">Hapus</button>`;
+                cartList.appendChild(li);
+            });
+            document.getElementById('total-price').textContent = `Total: Rp ${total}`;
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert("Keranjang kosong!");
+                return;
+            }
+
+            const orderData = {
+                user_id: user.id,
+                items: cart.map(item => ({
+                    product_id: item.product_id,
+                    quantity: item.quantity
+                }))
+            };
+
+            fetch(host + '/api/routes.php?action=addToOrder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    printReceipt();
+                    alert("Transaksi berhasil");
+                    cart = [];
+                    renderCart();
+                    fetchProducts();
+                } else if (data.error) {
+                    alert("Gagal: " + data.error);
+                } else {
+                    alert("Terjadi kesalahan tak terduga.");
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert("Terjadi kesalahan jaringan.");
+            });
+        }
+
+        function printReceipt() {
+            let popup = window.open('', '', 'width=400,height=600');
+            popup.document.write('<h2>Struk Pembelian</h2><ul>');
+            let total = 0;
+            cart.forEach(item => {
+                popup.document.write(`<li>${item.name} x${item.quantity} = Rp ${item.quantity * item.price}</li>`);
+                total += item.quantity * item.price;
+            });
+            popup.document.write(`</ul><h3>Total: Rp ${total}</h3>`);
+            popup.document.close();
+            popup.print();
+        }
+
+        fetchProducts();
+    </script>
+</body>
+</html>

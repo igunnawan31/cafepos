@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Data Produk - CafePOS</title>
+    <link rel="stylesheet" href="css/products.css"/>
+</head>
+<body>
+    <div class="container">
+        <button class="off back-btn" onclick="history.back()">Kembali</button>
+        <h2>CafePOS - Data Transaksi Semua Kasir</h2>
+        <h3>Tambah Produk</h3>
+        <input id="namaproduk" type="text" placeholder="Nama produk" />
+        <input id="hargaproduk" type="number" placeholder="Harga" />
+        <input id="stokproduk" type="number" placeholder="Stok" />
+        <button class="on" onclick="tambahProduk()">Simpan</button>
+
+        <h3>Daftar Produk</h3>
+        <table id="tabel-produk">
+            <thead>
+                <tr><th>Nama</th><th>Harga</th><th>Stok</th><th>Aksi</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="js/init.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            window.location.href = 'login.html';
+        } else {
+            loadProduk();
+        }
+
+        function tambahProduk() {
+            const nama = document.getElementById('namaproduk').value;
+            const harga = document.getElementById('hargaproduk').value;
+            const stok = document.getElementById('stokproduk').value;
+
+            fetch(host + '/api/routes.php?action=addProduct', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: nama, price: harga, stock: stok })
+            })
+            .then(res => res.text())
+            .then(msg => { 
+                alert(msg); 
+                loadProduk(); 
+            });
+        }
+
+        function loadProduk() {
+            fetch(host + '/api/routes.php?action=getProducts')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('#tabel-produk tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(prod => {
+                        tbody.innerHTML += `<tr id="row-${prod.id}">
+                            <td><input id="name-${prod.id}" type="text" value="${prod.name}"></td>
+                            <td><input id="price-${prod.id}" type="number" value="${prod.price}"></td>
+                            <td><input id="stock-${prod.id}" type="number" value="${prod.stock}"></td>
+                            <td>
+                                <button class="table-btn" onclick="editProduk(${prod.id})">Ubah</button>
+                                <button class="table-btn" onclick="hapusProduk(${prod.id})">Hapus</button>
+                            </td>
+                        </tr>`;
+                    });
+                });
+        }
+
+        function editProduk(id) {
+            const name = document.getElementById(`name-${id}`).value;
+            const price = document.getElementById(`price-${id}`).value;
+            const stock = document.getElementById(`stock-${id}`).value;
+
+            fetch(host + '/api/routes.php?action=editProduct', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, name, price, stock })
+            })
+            .then(res => res.text())
+            .then(msg => {
+                alert(msg);
+                loadProduk();
+            });
+        }
+
+        function hapusProduk(id) {
+            if (confirm('Yakin ingin menghapus produk ini?')) {
+                fetch(host + '/api/routes.php?action=deleteProduct', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                })
+                .then(res => res.text())
+                .then(msg => { 
+                    alert(msg); 
+                    loadProduk(); 
+                });
+            }
+        }
+    </script>
+</body>
+</html>

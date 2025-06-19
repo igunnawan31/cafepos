@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kasir - Data Transaksi - CafePOS</title></title>
+    <link rel="stylesheet" href="css/orderhistory.css"/>
+</head>
+<body>
+    <div class="container">
+        <button class="off" onclick="history.back()">Kembali</button>
+        <h2>CafePOS - Data Transaksi</h2>
+        <table id="tabel-transaksi">
+            <thead>
+                <tr><th>Kode</th><th>Tanggal</th><th>Kasir</th><th>Produk</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script src="js/init.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'kasir') window.location.href = 'login.html';
+
+        function loadTransaksi() {
+            fetch(host + '/api/routes.php?action=getOrders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: user.id
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.querySelector('#tabel-transaksi tbody');
+                    tbody.innerHTML = '';
+
+                    const grouped = {};
+                    data.forEach(row => {
+                        if (!grouped[row.order_id]) {
+                            grouped[row.order_id] = {
+                                created_at: row.created_at,
+                                kasir: row.kasir,
+                                items: []
+                            };
+                        }
+                        grouped[row.order_id].items.push({
+                            name: row.product_name,
+                            quantity: row.quantity,
+                            price: row.price
+                        });
+                    });
+
+                    Object.entries(grouped).forEach(([order_id, order]) => {
+                        const produkList = order.items.map(
+                            item => `${item.name} (x${item.quantity}) - Rp${item.price.toLocaleString()}`
+                        ).join('<br>');
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${order_id}</td>
+                                <td>${order.created_at}</td>
+                                <td>${order.kasir}</td>
+                                <td>${produkList}</td>
+                            </tr>`;
+                    });
+                });
+        }
+
+        loadTransaksi();
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - CafePOS</title>
+    <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+    <div class="admin-container">
+        <h2>CafePOS - Admin</h2>
+        <button onclick="goto_products()">Data Produk</button>
+        <button onclick="goto_users()">Data Kasir</button>
+        <button onclick="goto_allorderhistory()">Data Transaksi</button>
+        <button onclick="auth_logout()">Logout</button>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'admin') window.location.href = 'login.html';
+
+        function goto_products() {
+            window.location.href = 'products.html'; 
+        }
+
+        function goto_users() {
+            window.location.href = 'users.html'; 
+        }
+
+        function goto_allorderhistory() {
+            window.location.href = 'allorderhistory.html'; 
+        }
+    </script>
+</body>
+</html>

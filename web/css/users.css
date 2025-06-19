@@ -1,0 +1,133 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+}
+
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 10px;
+}
+
+button:nth-child(1) {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button:nth-child(1):hover {
+    background-color: #45a049;
+}
+
+button:nth-child(2) {
+    background-color: #f44336;
+    color: white;
+}
+
+button:nth-child(2):hover {
+    background-color: #e53935;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+button.table-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+button.table-btn:nth-child(1) {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button.table-btn:nth-child(1):hover {
+    background-color: #45a049;
+}
+
+button.table-btn:nth-child(2) {
+    background-color: #f44336;
+    color: white;
+}
+
+button.table-btn:nth-child(2):hover {
+    background-color: #e53935;
+}
+
+button.on {
+    background-color: #4CAF50;
+    color: white;
+}
+
+button.on:hover {
+    background-color: #45a049;
+    color: white;
+}
+
+button.off {
+    background-color: #b4b4b4;
+    color: white;
+}
+
+button.off:hover {
+    background-color: #7c7c7c;
+    color: white;
+}

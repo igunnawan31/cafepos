@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kasir - CafePOS</title>
+    <link rel="stylesheet" href="css/cashier.css"/>
+</head>
+<body>
+    <div class="container">
+        <h2>CafePOS - Kasir</h2>
+        <button onclick="goto_order()">Transaksi Baru</button>
+        <button onclick="goto_orderhistory()">Data Transaksi</button>
+        <button onclick="auth_logout()">Logout</button>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'kasir') window.location.href = 'login.html';
+
+        function goto_order() {
+            window.location.href = 'order.html'; 
+        }
+
+        function goto_orderhistory() {
+            window.location.href = 'orderhistory.html'; 
+        }
+    </script>
+</body>
+</html>

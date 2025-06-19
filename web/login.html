@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - CafePOS</title>
+    <link rel="stylesheet" href="css/login.css"/>
+</head>
+<body onload="auth_check()">
+    <div class="login-container">
+        <h2>Login CafePOS</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <button onclick="goto_index()">Kembali</button>
+    </div>
+
+    <script src="js/init.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function login() {
+            fetch(host + '/api/routes.php?action=login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = data.user.role === 'admin' ? 'admin.html' : 'cashier.html';
+                } else {
+                    alert('Login gagal');
+                }
+            });
+        }
+
+        function goto_index() {
+            window.location.href = 'index.html'; 
+        }
+    </script>
+</body>
+</html>
