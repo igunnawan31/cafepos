@@ -1,0 +1,6 @@
+[
+  {
+    "type": "sqlite",
+    "path": "d:\\xampp\\htdocs\\cafepos\\database\\pos.sqlite"
+  }
+]
