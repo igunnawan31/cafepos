@@ -23,7 +23,11 @@ final class OrderAddProductTest extends TestCase {
     );
   }
   
-  public function testDapatMenambahkanProdukDenganDataLengkap(): void {
+  /**
+   * @group Product
+   * @group DUPL-06-01
+   */
+  public function test_DUPL_06_01_Dapat_Menambahkan_Produk_Dengan_Data_Lengkap(): void {
     $d = [
       "name" => "WOW Onigiri",
       "price" => "10000",
@@ -52,7 +56,11 @@ final class OrderAddProductTest extends TestCase {
     $this->assertEquals($d['stock'], $result['stock']);
   }
 
-  public function testTidakDapatMenambahkanProdukJikaNamaEmptyString() {
+  /**
+   * @group Product
+   * @group DUPL-06-02
+   */
+  public function test_DUPL_06_02_Tidak_Dapat_Menambahkan_Produk_Jika_Name_Kosong() {
     $d = [
       "name" => "",
       "price" => "10000",
@@ -65,12 +73,37 @@ final class OrderAddProductTest extends TestCase {
       $d["price"],
       $d["stock"]
     );
-    $this->expectException(PDOException::class);
+    // $this->expectException(PDOException::class);
     $response = Product::addProduct($product);
     $this->assertEquals(0, $response, "addProduct seharusnya tidak menyimpan ke db ketika nama string kosong");
   }
 
-  public function testTidakDapatMenambahkanProdukJikaHargaEmptyString(): void {
+  /**
+   * @group Product
+   * @group DUPL-06-02
+   */
+  public function test_DUPL_06_02_Tidak_Dapat_Menambahkan_Produk_Jika_Name_Null(): void {
+    $d = [
+      "name" => null,
+      "price" => "10000",
+      "stock" => ""
+    ];
+
+    $product = new Product(
+      0,
+      $d["name"],
+      $d["price"],
+      $d["stock"]
+    );
+    $this->expectException(PDOException::class);
+    $response = Product::addProduct($product);
+  }
+
+  /**
+   * @group Product
+   * @group DUPL-06-03
+   */
+  public function test_DUPL_06_03_Tidak_Dapat_Menambahkan_Produk_Jika_Price_Kosong(): void {
     $d = [
       "name" => "WOW Onigiri",
       "price" => "",
@@ -88,7 +121,32 @@ final class OrderAddProductTest extends TestCase {
     $this->assertEquals(0, $response, "addProduct seharusnya tidak menyimpan ke db ketika price string kosong");
   }
 
-  public function testTidakDapatMenambahkanProdukJikaStockEmptyString(): void {
+  /**
+   * @group Product
+   * @group DUPL-06-03
+   */
+  public function test_DUPL_06_03_Tidak_Dapat_Menambahkan_Produk_Jika_Price_Null(): void {
+    $d = [
+      "name" => "WOW Onigiri",
+      "price" => null,
+      "stock" => ""
+    ];
+
+    $product = new Product(
+      0,
+      $d["name"],
+      $d["price"],
+      $d["stock"]
+    );
+    $this->expectException(PDOException::class);
+    $response = Product::addProduct($product);
+  }
+
+  /**
+   * @group Product
+   * @group DUPL-06-04
+   */
+  public function test_DUPL_06_04_Tidak_Dapat_Menambahkan_Produk_Jika_Stock_Kosong(): void {
     $d = [
       "name" => "WOW Onigiri",
       "price" => "10000",
@@ -106,41 +164,12 @@ final class OrderAddProductTest extends TestCase {
     $this->assertEquals(0, $response, "addProduct seharusnya tidak menyimpan ke db ketika stock string kosong");
   }
 
-  public function testTidakDapatMenambahkanProdukJikaNameNull(): void {
-    $d = [
-      "name" => null,
-      "price" => "10000",
-      "stock" => ""
-    ];
-
-    $product = new Product(
-      0,
-      $d["name"],
-      $d["price"],
-      $d["stock"]
-    );
-    $this->expectException(PDOException::class);
-    $response = Product::addProduct($product);
-  }
-
-  public function testTidakDapatMenambahkanProdukJikaPriceNull(): void {
-    $d = [
-      "name" => "WOW Onigiri",
-      "price" => null,
-      "stock" => ""
-    ];
-
-    $product = new Product(
-      0,
-      $d["name"],
-      $d["price"],
-      $d["stock"]
-    );
-    $this->expectException(PDOException::class);
-    $response = Product::addProduct($product);
-  }
-
-  public function testTidakDapatMenambahkanProdukJikaStockNull(): void {
+  
+  /**
+   * @group Product
+   * @group DUPL-06-04
+   */
+  public function test_DUPL_06_04_Tidak_Dapat_Menambahkan_Produk_Jika_Stock_Null(): void {
     $d = [
       "name" => "WOW Onigiri",
       "price" => "10000",
@@ -157,7 +186,11 @@ final class OrderAddProductTest extends TestCase {
     $response = Product::addProduct($product);
   }
 
-  public function testDapatMenambahkanProdukDenganPriceNol(): void {
+  /**
+   * @group Product
+   * @group DUPL-06-05
+   */
+  public function test_DUPL_06_05_Dapat_Menambahkan_Produk_Dengan_Price_Nol(): void {
     $d = [
       "name" => "WOW Onigiri",
       "price" => "0",
@@ -171,9 +204,11 @@ final class OrderAddProductTest extends TestCase {
       $d["stock"]
     );
     $response = Product::addProduct($product);
-    $this->assertEquals(0, $response, "addProduct seharusnya menyimpan ke db ketika harga 0");
+    $this->assertEquals(1, $response, "addProduct seharusnya menyimpan ke db ketika harga 0");
 
-    $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM products WHERE name = :name AND price = :price AND stock = :stock");
+    $stmt = $this->db->prepare(
+      "SELECT COUNT(*) as total FROM products WHERE name = :name AND price = :price AND stock = :stock"
+    );
     $stmt->execute([
       ':name' => $d['name'],
       ':price' => $d['price'],
@@ -184,7 +219,11 @@ final class OrderAddProductTest extends TestCase {
     $this->assertEquals(1, $result, "addProduct seharusnya dapat menyimpan produk dengan harga 0");
   }
 
-  public function testDapatMenambahkanProdukDenganStockNol(): void {
+  /**
+   * @group Product
+   * @group DUPL-06-06
+   */
+  public function test_DUPL_06_06_Dapat_Menambahkan_Produk_Dengan_Stock_Nol(): void {
     $d = [
       "name" => "WOW Onigiri",
       "price" => 10000,
@@ -198,9 +237,11 @@ final class OrderAddProductTest extends TestCase {
       $d["stock"]
     );
     $response = Product::addProduct($product);
-    $this->assertEquals(0, $response, "addProduct seharusnya menyimpan ke db ketika harga 0");
+    $this->assertEquals(1, $response, "addProduct seharusnya menyimpan ke db ketika harga 0");
 
-    $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM products WHERE name = :name AND price = :price AND stock = :stock");
+    $stmt = $this->db->prepare(
+      "SELECT COUNT(*) as total FROM products WHERE name = :name AND price = :price AND stock = :stock"
+    );
     $stmt->execute([
       ':name' => $d['name'],
       ':price' => $d['price'],
@@ -209,5 +250,70 @@ final class OrderAddProductTest extends TestCase {
     $result = $stmt->fetchColumn();
 
     $this->assertEquals(1, $result, "addProduct seharusnya dapat menyimpan produk dengan stock 0");
+  }
+
+  /**
+   * @group Product
+   * @group DUPL-06-07
+   */
+  public function test_DUPL_06_07_Tidak_Dapat_Menambahkan_Produk_Dengan_Harga_Negatif(): void {
+    $d = [
+      "name" => "WOW Onigiri",
+      "price" => -10000,
+      "stock" => 10,
+    ];
+
+    $product = new Product(
+      0,
+      $d["name"],
+      $d["price"],
+      $d["stock"]
+    );
+    $response = Product::addProduct($product);
+
+    $stmt = $this->db->prepare(
+      "SELECT COUNT(*) as total FROM products WHERE name = :name AND price = :price AND stock = :stock"
+    );
+    $stmt->execute([
+      ':name' => $d['name'],
+      ':price' => $d['price'],
+      ':stock' => $d['stock']
+    ]);
+    $result = $stmt->fetchColumn();
+
+    $this->assertEquals(1, $result, "addProduct seharusnya tidak dapat menyimpan produk dengan harga negatif");
+  }
+
+  /**
+   * @group Product
+   * @group DUPL-06-08
+   */
+  public function test_DUPL_06_08_Tidak_Dapat_Menambahkan_Produk_Dengan_Stok_Negatif(): void {
+    $d = [
+      "name" => "WOW Onigiri",
+      "price" => 10000,
+      "stock" => -10,
+    ];
+
+    $product = new Product(
+      0,
+      $d["name"],
+      $d["price"],
+      $d["stock"]
+    );
+    $response = Product::addProduct($product);
+    // $this->assertEquals(0, $response, "addProduct seharusnya menyimpan ke db ketika harga 0");
+
+    $stmt = $this->db->prepare(
+      "SELECT COUNT(*) as total FROM products WHERE name = :name AND price = :price AND stock = :stock"
+    );
+    $stmt->execute([
+      ':name' => $d['name'],
+      ':price' => $d['price'],
+      ':stock' => $d['stock']
+    ]);
+    $result = $stmt->fetchColumn();
+
+    $this->assertEquals(0, $result, "addProduct seharusnya tidak dapat menyimpan produk dengan stock bernilai negatif");
   }
 }

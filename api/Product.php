@@ -52,4 +52,8 @@ class Product
         $stmt = $db->prepare("DELETE FROM products WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    public function getName() {
+        return $this->name;
+    }
 }

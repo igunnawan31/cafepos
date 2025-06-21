@@ -38,6 +38,6 @@ CREATE TABLE IF NOT EXISTS order_details (
 );
 
 INSERT INTO users (username, password, role) VALUES ('admin', '123456', 'admin'), ('kasir1', '12345', 'kasir');
-INSERT INTO products (name, price, stock) VALUES ('Kopi', 15000, 10), ('Teh', 10000, 5), ('Roti Bakar', 20000, 7);";
+INSERT INTO products (name, price, stock) VALUES ('Kopi', 15000, 100), ('Teh', 10000, 50), ('Roti Bakar', 20000, 70);";
   }
 }
